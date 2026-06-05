@@ -10,43 +10,42 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v4
         with:
-          node-version: "24"
+          node-version: "20"
 
       - name: Install healthapp dependencies
         working-directory: ./healthapp
-        run: npm install
+        run: npm ci
 
       - name: Lint healthapp
         working-directory: ./healthapp
         run: npm run lint
 
+      - name: Install test dependencies
+        working-directory: ./healthapp-tests
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: ./healthapp-tests
+        # Removed --with-deps to stop the pipeline from hanging
+        run: npx playwright install chromium
+
       - name: Start healthapp server
         working-directory: ./healthapp
         run: |
           npm start &
-          echo $! > server.pid
-          sleep 3
-
-      - name: Install test dependencies
-        working-directory: ./healthapp-tests
-        run: npm install
-
-      - name: Install Playwright browsers
-        working-directory: ./healthapp-tests
-        # Removed --with-deps so it doesn't hang waiting for Linux permissions
-        run: npx playwright install chromium
+          npx wait-on http://localhost:3000 --timeout 30000
 
       - name: Run e2e tests
         working-directory: ./healthapp-tests
         run: npm test
 
       - name: Upload test report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-report
@@ -55,8 +54,4 @@ jobs:
 
       - name: Stop healthapp server
         if: always()
-        working-directory: ./healthapp
-        run: |
-          if [ -f server.pid ]; then
-            kill $(cat server.pid) || true
-          fi
+        run: pkill -f "npm start" || true
