@@ -1,3 +1,4 @@
+/// <reference types="node" />
 interface Result {
   periodLength: number;
   trainingDays: number;

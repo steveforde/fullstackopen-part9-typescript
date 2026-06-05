@@ -1,3 +1,4 @@
+/// <reference types="node" />
 const calculateBmi = (heightCm: number, weightKg: number): string => {
   const heightMeters = heightCm / 100;
   const bmi = weightKg / (heightMeters * heightMeters);
