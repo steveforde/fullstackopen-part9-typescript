@@ -37,8 +37,9 @@ jobs:
       - name: Start healthapp server
         working-directory: ./healthapp
         run: |
-          npm start &
-          npx wait-on http://localhost:3000 --timeout 30000
+          npm start > server.log 2>&1 &
+          echo $! > server.pid
+          npx wait-on http://localhost:3000 --timeout 30000 || (cat server.log && exit 1)
 
       - name: Run e2e tests
         working-directory: ./healthapp-tests
