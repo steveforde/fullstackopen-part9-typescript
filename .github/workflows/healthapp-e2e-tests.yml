@@ -31,19 +31,11 @@ jobs:
 
       - name: Install Playwright browsers
         working-directory: ./healthapp-tests
-        # Removed --with-deps to stop the pipeline from hanging
         run: npx playwright install chromium
 
-      - name: Start healthapp server
-        working-directory: ./healthapp
-        run: |
-          npm start > server.log 2>&1 &
-          echo $! > server.pid
-          npx wait-on http://localhost:3000 --timeout 30000 || (cat server.log && exit 1)
-
-      - name: Run e2e tests
+      - name: Start server and run E2E tests
         working-directory: ./healthapp-tests
-        run: npm test
+        run: npm run test:ci
 
       - name: Upload test report
         uses: actions/upload-artifact@v4
@@ -52,7 +44,3 @@ jobs:
           name: playwright-report
           path: healthapp-tests/playwright-report/
           retention-days: 30
-
-      - name: Stop healthapp server
-        if: always()
-        run: pkill -f "npm start" || true
