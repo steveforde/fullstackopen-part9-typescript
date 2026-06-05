@@ -21,5 +21,39 @@ const calculateBmi = (heightCm: number, weightKg: number): string => {
   }
 };
 
-// Hardcoded test case matching the instructions exactly
-console.log(calculateBmi(180, 74));
+// Helper interface for parsed arguments
+interface BmiArguments {
+  height: number;
+  weight: number;
+}
+
+const parseBmiArguments = (args: string[]): BmiArguments => {
+  // Check if the user didn't give exactly 2 arguments (height and weight)
+  if (args.length < 4)
+    throw new Error(
+      "Not enough arguments. Provide height (cm) and weight (kg).",
+    );
+  if (args.length > 4) throw new Error("Too many arguments.");
+
+  // Check if both inputs are valid numbers
+  if (!isNaN(Number(args[2])) && !isNaN(Number(args[3]))) {
+    return {
+      height: Number(args[2]),
+      weight: Number(args[3]),
+    };
+  } else {
+    throw new Error("Provided values were not numbers!");
+  }
+};
+
+try {
+  // Pass process.argv into our parser
+  const { height, weight } = parseBmiArguments(process.argv);
+  console.log(calculateBmi(height, weight));
+} catch (error: unknown) {
+  let errorMessage = "Something bad happened.";
+  if (error instanceof Error) {
+    errorMessage += " Error: " + error.message;
+  }
+  console.log(errorMessage);
+}

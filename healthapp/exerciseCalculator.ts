@@ -54,5 +54,51 @@ const calculateExercises = (
   };
 };
 
-// Hardcoded test case from the instructions to see if it works
-console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1], 2));
+interface ExerciseArguments {
+  target: number;
+  dailyExercises: number[];
+}
+
+const parseExerciseArguments = (args: string[]): ExerciseArguments => {
+  if (args.length < 4)
+    throw new Error(
+      "Not enough arguments. Provide a target and at least one day of exercise.",
+    );
+
+  // Grab the target value
+  const target = Number(args[2]);
+
+  // Slice everything from index 3 to the end to get the daily hours array
+  const dailyExercisesStrings = args.slice(3);
+
+  // Convert those strings into real numbers
+  const dailyExercises = dailyExercisesStrings.map((hours) => Number(hours));
+
+  // Check if target is a valid number
+  if (isNaN(target)) {
+    throw new Error("The target value must be a valid number!");
+  }
+
+  // Check if any of the daily exercise hours are not valid numbers
+  if (dailyExercises.some((hours) => isNaN(hours))) {
+    throw new Error(
+      "All provided daily exercise values must be valid numbers!",
+    );
+  }
+
+  return {
+    target,
+    dailyExercises,
+  };
+};
+
+try {
+  const { target, dailyExercises } = parseExerciseArguments(process.argv);
+  console.log(calculateExercises(dailyExercises, target));
+} catch (error: unknown) {
+  let errorMessage = "Something bad happened.";
+  if (error instanceof Error) {
+    errorMessage += " Error: " + error.message;
+  }
+  console.log(errorMessage);
+}
