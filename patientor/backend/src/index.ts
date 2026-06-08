@@ -1,20 +1,22 @@
 import express from "express";
-import cors from "cors";
-import diagnosisRouter from "./routes/diagnoses";
+import cors from "cors"; // 1. Import cors
+import diagnosisRouter from "./routes/diagnoses.js";
+import patientRouter from "./routes/patients.js";
 
 const app = express();
-app.use(express.json());
-app.use(cors());
 
-const PORT = 3001; // Patientor runs on 3001!
+app.use(cors()); // 2. Enable CORS for all origins
+app.use(express.json());
+
+const PORT = 3001;
 
 app.get("/api/ping", (_req, res) => {
   console.log("someone pinged here");
   res.send("pong");
 });
 
-// Mount your new router here:
 app.use("/api/diagnoses", diagnosisRouter);
+app.use("/api/patients", patientRouter); // Ensure this line is exactly here
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
