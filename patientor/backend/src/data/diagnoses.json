@@ -1,0 +1,21 @@
+[
+  {
+    "code": "M23.4",
+    "name": "Loose body in knee joint",
+    "latin": "Corpus liberum articuli genus"
+  },
+  {
+    "code": "M23.5",
+    "name": "Chronic instability of knee",
+    "latin": "Instabilitas chronica articuli genus"
+  },
+  {
+    "code": "M24.2",
+    "name": "Disorder of ligament",
+    "latin": "Morbus ligamenti"
+  },
+  {
+    "code": "M25.5",
+    "name": "Pain in joint"
+  }
+]
