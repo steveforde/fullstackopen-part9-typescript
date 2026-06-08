@@ -1,5 +1,5 @@
 import { type Request, type Response, type NextFunction } from "express";
-import { NewEntrySchema } from "./types.ts";
+import { NewEntrySchema } from "./types";
 import { z } from "zod";
 
 export const newDiaryParser = (

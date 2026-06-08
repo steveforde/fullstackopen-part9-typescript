@@ -1,5 +1,5 @@
 import express from "express";
-import diaryRouter from "./routes/diaries.ts"; // 1. Import your diaries router
+import diaryRouter from "./routes/diaries"; // Explicitly no extension
 
 const app = express();
 app.use(express.json());
@@ -11,7 +11,6 @@ app.get("/ping", (_req, res) => {
   res.send("pong");
 });
 
-// 2. Mount the router to the /api/diaries base path
 app.use("/api/diaries", diaryRouter);
 
 app.listen(PORT, () => {

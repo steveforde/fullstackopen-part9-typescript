@@ -1,14 +1,11 @@
 {
   "compilerOptions": {
-    "target": "esnext",
-    "noEmit": true,
-    "module": "nodenext",
-    "esModuleInterop": true,
-    "allowImportingTsExtensions": true,
-    "strict" : true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-  }
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": "./src",
+    "strict": true,
+    "skipLibCheck": true
+  }, // <-- Make sure this comma is here!
+  "include": ["src/**/*"]
 }

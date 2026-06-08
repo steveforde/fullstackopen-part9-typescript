@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+// 1. Define runtime objects for Enums
 export const Weather = {
   Sunny: "sunny",
   Rainy: "rainy",
@@ -8,27 +9,26 @@ export const Weather = {
   Windy: "windy",
 } as const;
 
-export type Weather = (typeof Weather)[keyof typeof Weather];
-
 export const Visibility = {
   Great: "great",
   Good: "good",
   Ok: "ok",
-  Poor: "poor", //  Fixed to a colon
+  Poor: "poor",
 } as const;
 
+// 2. Extract types from runtime objects
+export type Weather = (typeof Weather)[keyof typeof Weather];
 export type Visibility = (typeof Visibility)[keyof typeof Visibility];
 
-// Define schema validation using Zod
+// 3. Define the Zod parsing schema
 export const NewEntrySchema = z.object({
-  // z.nativeEnum works beautifully with "as const" objects
   weather: z.nativeEnum(Weather),
   visibility: z.nativeEnum(Visibility),
-  // Validates that the input is a valid ISO 8601 date string (YYYY-MM-DD)
-  date: z.string().date(),
+  date: z.string().date(), // Requires valid YYYY-MM-DD strings
   comment: z.string().optional(),
 });
 
+// 4. Infer types from schema and build structural interfaces
 export type NewDiaryEntry = z.infer<typeof NewEntrySchema>;
 
 export interface DiaryEntry extends NewDiaryEntry {
