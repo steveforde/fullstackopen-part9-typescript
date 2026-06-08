@@ -15,3 +15,5 @@ export interface Patient {
 
 // Use Omit utility type to create a type without the sensitive ssn field
 export type NonSensitivePatient = Omit<Patient, "ssn">;
+
+export type NewPatientEntry = Omit<Patient, "id">;
