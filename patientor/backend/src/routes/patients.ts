@@ -1,5 +1,6 @@
 import express from "express";
 import patientService from "../services/patientService.js";
+import toNewPatientEntry from "../utils.js"; // Note the .js extension!
 
 const router = express.Router();
 
@@ -7,18 +8,13 @@ router.get("/", (_req, res) => {
   res.send(patientService.getNonSensitiveEntries());
 });
 
-// Add the POST endpoint here in the patientor project
 router.post("/", (req, res) => {
   try {
-    const { name, dateOfBirth, ssn, gender, occupation } = req.body;
+    // Safely validate and parse the incoming data fields
+    const newPatientEntry = toNewPatientEntry(req.body);
 
-    const addedEntry = patientService.addPatient({
-      name,
-      dateOfBirth,
-      ssn,
-      gender,
-      occupation,
-    });
+    // Pass the typed and verified data to our service
+    const addedEntry = patientService.addPatient(newPatientEntry);
 
     res.json(addedEntry);
   } catch (error: unknown) {

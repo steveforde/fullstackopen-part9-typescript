@@ -1,0 +1,25 @@
+### Test 1: Successful Patient Creation
+POST http://localhost:3001/api/patients
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "dateOfBirth": "1985-04-12",
+  "ssn": "120485-123A",
+  "gender": "male",
+  "occupation": "Software Engineer"
+}
+
+###
+
+### Test 2: Failed Validation (Invalid Gender)
+POST http://localhost:3001/api/patients
+Content-Type: application/json
+
+{
+  "name": "Jane Doe",
+  "dateOfBirth": "1990-08-24",
+  "ssn": "240890-456B",
+  "gender": "superman",
+  "occupation": "Designer"
+}
