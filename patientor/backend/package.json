@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "start": "tsx src/index.ts",
-    "lint": "ESLINT_USE_FLAT_CONFIG=false eslint ."
+    "lint": "eslint ."
   },
   "keywords": [],
   "author": "",
