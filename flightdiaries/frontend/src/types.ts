@@ -3,5 +3,8 @@ export interface DiaryEntry {
   date: string;
   weather: string;
   visibility: string;
-  comment?: string; // Optional since the backend might omit it
+  comment?: string;
 }
+
+// Omit the 'id' field for new creations
+export type NewDiaryEntry = Omit<DiaryEntry, "id">;
