@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { DiaryEntry } from "./types";
 import { getAllDiaries, createDiary } from "./diaryService";
-import axios from "axios"; // Import axios to narrow the error type
+import axios from "axios";
 
 const App = () => {
   const [diaries, setDiaries] = useState<DiaryEntry[]>([]);
@@ -11,9 +11,11 @@ const App = () => {
   const [weather, setWeather] = useState("");
   const [visibility, setVisibility] = useState("");
   const [comment, setComment] = useState("");
-
-  // New state to hold the backend error message
   const [errorMessage, setErrorMessage] = useState("");
+
+  // Allowed option arrays to cleanly map out our radio fields
+  const visibilityOptions = ["great", "good", "ok", "poor"];
+  const weatherOptions = ["sunny", "rainy", "cloudy", "stormy", "windy"];
 
   useEffect(() => {
     getAllDiaries().then((data) => {
@@ -33,31 +35,27 @@ const App = () => {
       });
       setDiaries(diaries.concat(addedEntry));
 
-      // Reset form fields on success
+      // Reset fields on successful addition
       setDate("");
       setWeather("");
       setVisibility("");
       setComment("");
-      setErrorMessage(""); // Clear out any previous errors
+      setErrorMessage("");
     } catch (error: unknown) {
       if (axios.isAxiosError(error) && error.response) {
         const data = error.response.data;
 
-        // Check if backend returned the Zod error object structure
         if (data && typeof data === "object" && "error" in data) {
           try {
-            // Parse the internal stringified JSON array from Zod
             const zodErrors = JSON.parse(data.error as string);
             if (Array.isArray(zodErrors) && zodErrors.length > 0) {
               const firstIssue = zodErrors[0];
-              const fieldName = firstIssue.path[0]; // 'visibility' or 'weather'
+              const fieldName = firstIssue.path[0];
 
-              // Map the failing field to the exact text currently typed into the input state
               let invalidValue = "";
               if (fieldName === "visibility") invalidValue = visibility;
               if (fieldName === "weather") invalidValue = weather;
 
-              // Generates the required format string: "Incorrect visibility: best ever"
               setErrorMessage(`Incorrect ${fieldName}: ${invalidValue}`);
             } else {
               setErrorMessage("Validation failed on the backend.");
@@ -78,19 +76,26 @@ const App = () => {
   };
 
   return (
-    <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
+    // Max-width keeps it compact, margin-left 0 aligns everything cleanly to the left side
+    <div
+      style={{
+        padding: "20px",
+        fontFamily: "sans-serif",
+        maxWidth: "600px",
+        textAlign: "left",
+      }}
+    >
       <h2>Add new entry</h2>
 
-      {/* Display the error message in red if it exists */}
       {errorMessage && (
         <p style={{ color: "red", fontWeight: "bold" }}>
           Error: {errorMessage}
         </p>
       )}
 
-      <form onSubmit={diaryCreation} style={{ marginBottom: "20px" }}>
-        <div>
-          date:{" "}
+      <form onSubmit={diaryCreation} style={{ marginBottom: "30px" }}>
+        <div style={{ marginBottom: "10px" }}>
+          <span style={{ marginRight: "10px" }}>date:</span>
           <input
             type="date"
             value={date}
@@ -98,35 +103,92 @@ const App = () => {
             required
           />
         </div>
-        <div>
-          visibility:{" "}
-          <input
-            value={visibility}
-            onChange={(e) => setVisibility(e.target.value)}
-            required
-          />
+
+        {/* Visibility Radio Buttons Row */}
+        <div
+          style={{
+            display: "flex",
+            gap: "15px",
+            alignItems: "center",
+            marginBottom: "10px",
+          }}
+        >
+          <span>visibility:</span>
+          {visibilityOptions.map((option) => (
+            <label
+              key={option}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "5px",
+                cursor: "pointer",
+              }}
+            >
+              {option}
+              <input
+                type="radio"
+                name="visibility"
+                value={option}
+                checked={visibility === option}
+                onChange={() => setVisibility(option)}
+              />
+            </label>
+          ))}
         </div>
-        <div>
-          weather:{" "}
-          <input
-            value={weather}
-            onChange={(e) => setWeather(e.target.value)}
-            required
-          />
+
+        {/* Weather Radio Buttons Row */}
+        <div
+          style={{
+            display: "flex",
+            gap: "15px",
+            alignItems: "center",
+            marginBottom: "10px",
+          }}
+        >
+          <span>weather:</span>
+          {weatherOptions.map((option) => (
+            <label
+              key={option}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "5px",
+                cursor: "pointer",
+              }}
+            >
+              {option}
+              <input
+                type="radio"
+                name="weather"
+                value={option}
+                checked={weather === option}
+                onChange={() => setWeather(option)}
+              />
+            </label>
+          ))}
         </div>
-        <div>
-          comment:{" "}
+
+        <div style={{ marginBottom: "15px" }}>
+          <span style={{ marginRight: "10px" }}>comment:</span>
           <input value={comment} onChange={(e) => setComment(e.target.value)} />
         </div>
-        <button type="submit">add</button>
+
+        <button
+          type="submit"
+          style={{ padding: "4px 12px", cursor: "pointer" }}
+        >
+          add
+        </button>
       </form>
+
+      <hr style={{ border: "0.5px solid #ccc", margin: "20px 0" }} />
 
       <h2>Diary entries</h2>
       {diaries.map((diary) => (
-        <div key={diary.id} style={{ marginBottom: "10px" }}>
-          <h3>{diary.date}</h3>
-          <p>visibility: {diary.visibility}</p>
-          <p>weather: {diary.weather}</p>
+        <div key={diary.id} style={{ marginBottom: "20px" }}>
+          <h3 style={{ margin: "0 0 5px 0" }}>{diary.date}</h3>
+          <p style={{ margin: "2px 0" }}>visibility: {diary.visibility}</p>
+          <p style={{ margin: "2px 0" }}>weather: {diary.weather}</p>
         </div>
       ))}
     </div>
