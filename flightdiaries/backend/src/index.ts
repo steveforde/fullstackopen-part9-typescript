@@ -1,7 +1,11 @@
 import express from "express";
-import diaryRouter from "./routes/diaries"; // Explicitly no extension
+import cors from "cors";
+import diaryRouter from "./routes/diaries";
 
 const app = express();
+
+// Enable clean CORS for all incoming cross-origin requests
+app.use(cors());
 app.use(express.json());
 
 const PORT = 3000;
