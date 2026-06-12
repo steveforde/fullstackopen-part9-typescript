@@ -23,3 +23,11 @@ Content-Type: application/json
   "gender": "superman",
   "occupation": "Designer"
 }
+
+
+
+### Get all patients
+GET http://localhost:3001/api/patients
+
+### Get John McClane
+GET http://localhost:3001/api/patients/d2773336-f723-11e9-8f0b-362b9be15567

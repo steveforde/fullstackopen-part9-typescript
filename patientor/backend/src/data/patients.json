@@ -1,42 +1,94 @@
 [
   {
-    "id": "d2773336-f723-11e9-8f0b-362b9e155667",
+    "id": "d2773336-f723-11e9-8f0b-362b9be15567",
     "name": "John McClane",
     "dateOfBirth": "1986-07-09",
     "ssn": "090786-122X",
     "gender": "male",
-    "occupation": "New york city cop"
+    "occupation": "New york city cop",
+    "entries": [
+      {
+        "id": "d811e46d-70b3-4d90-b090-4535c7cf8fb1",
+        "date": "2015-01-02",
+        "type": "Hospital",
+        "specialist": "MD House",
+        "diagnosisCodes": ["S62.5"],
+        "description": "Healing time appr. 2 weeks. patient doesn't remember how he got the injury.",
+        "discharge": {
+          "date": "2015-01-16",
+          "criteria": "Thumb has healed."
+        }
+      }
+    ]
   },
   {
-    "id": "d2773598-f723-11e9-8f0b-362b9e155667",
+    "id": "d27733a4-f723-11e9-8f0b-362b9be15567",
     "name": "Martin Riggs",
     "dateOfBirth": "1979-01-30",
     "ssn": "300179-77A",
     "gender": "male",
-    "occupation": "Cop"
+    "occupation": "Cop",
+    "entries": [
+      {
+        "id": "fcd59fa6-c4b4-4fec-ac4d-df4fe1f85f62",
+        "date": "2019-08-05",
+        "type": "OccupationalHealthcare",
+        "specialist": "MD House",
+        "employerName": "HyPD",
+        "diagnosisCodes": ["Z57.1", "Z74.3", "M51.2"],
+        "description": "Patient mistakenly found himself in a nuclear plant waste site without protection gear. Very minor radiation poisoning.",
+        "sickLeave": {
+          "startDate": "2019-08-05",
+          "endDate": "2019-08-28"
+        }
+      }
+    ]
   },
   {
-    "id": "d27736ec-f723-11e9-8f0b-362b9e155667",
+    "id": "d27735ea-f723-11e9-8f0b-362b9be15567",
     "name": "Hans Gruber",
     "dateOfBirth": "1970-04-25",
     "ssn": "250470-555L",
     "gender": "male",
-    "occupation": "Technician"
+    "occupation": "Technician",
+    "entries": []
   },
   {
-    "id": "d2773822-f723-11e9-8f0b-362b9e155667",
+    "id": "d2773716-f723-11e9-8f0b-362b9be15567",
     "name": "Dana Scully",
     "dateOfBirth": "1974-01-05",
     "ssn": "050174-432N",
     "gender": "female",
-    "occupation": "Forensic Pathologist"
+    "occupation": "Forensic Pathologist",
+    "entries": [
+      {
+        "id": "b4f4eca1-050f-4343-a0e8-aef4ccbe1b1f",
+        "date": "2019-10-20",
+        "specialist": "MD House",
+        "type": "HealthCheck",
+        "description": "Yearly control visit. Chlamydia test negative.",
+        "healthCheckRating": 0
+      },
+      {
+        "id": "nc53b566-3411-457c-99ff-bcde231c2350",
+        "date": "2019-11-01",
+        "specialist": "Dr Sharman",
+        "type": "Hospital",
+        "description": "Patient complains of unremitting fatigue.",
+        "discharge": {
+          "date": "2019-11-05",
+          "criteria": "Patient recovered strike rate."
+        }
+      }
+    ]
   },
   {
-    "id": "d2773c6e-f723-11e9-8f0b-362b9e155667",
+    "id": "d27738be-f723-11e9-8f0b-362b9be15567",
     "name": "Muidu Mees",
-    "dateOfBirth": "1971-04-09",
-    "ssn": "090471-8890",
+    "dateOfBirth": "1986-04-06",
+    "ssn": "060486-123D",
     "gender": "other",
-    "occupation": "Digital nomad"
+    "occupation": "Digital nomad",
+    "entries": []
   }
 ]

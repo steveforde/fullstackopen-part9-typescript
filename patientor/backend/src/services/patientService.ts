@@ -1,49 +1,46 @@
-import patientsData from "../data/patients.json" with { type: "json" };
-import { Patient, NonSensitivePatient, NewPatientEntry } from "../types.js";
-import { v1 as uuid } from "uuid";
-
-// Typecast the JSON data safely to access optional properties during layout updates
-const patients: Patient[] = patientsData as Patient[];
+import patientData from "../data/patients.json" with { type: "json" };
+import { Patient, NonSensitivePatient, NewPatient } from "../types.js";
+import { v4 as uuid } from "uuid";
 
 const getEntries = (): Patient[] => {
-  return patients;
+  return patientData as Patient[];
 };
 
 const getNonSensitiveEntries = (): NonSensitivePatient[] => {
-  return patients.map(({ id, name, dateOfBirth, gender, occupation }) => ({
-    id,
-    name,
-    dateOfBirth,
-    gender,
-    occupation,
-  }));
+  return (patientData as Patient[]).map(
+    ({ id, name, dateOfBirth, gender, occupation, entries }) => ({
+      id,
+      name,
+      dateOfBirth,
+      gender,
+      occupation,
+      entries,
+    }),
+  );
 };
 
-const addPatient = (entry: NewPatientEntry): Patient => {
-  const newPatient: Patient = {
+const findById = (id: string): Patient | undefined => {
+  return (patientData as Patient[]).find((p) => p.id === id);
+};
+
+const addPatient = (entry: NewPatient): Patient => {
+  const newPatientEntry: Patient = {
     id: uuid(),
-    ...entry,
-    entries: [], // Initializes the missing field requirement for Step 1
+    name: entry.name,
+    occupation: entry.occupation,
+    gender: entry.gender,
+    ssn: entry.ssn || "",
+    dateOfBirth: entry.dateOfBirth || "",
+    entries: entry.entries || [],
   };
 
-  patients.push(newPatient);
-  return newPatient;
-};
-
-const getPatientById = (id: string): Patient | undefined => {
-  const patient = patients.find((p) => p.id === id);
-
-  if (!patient) return undefined;
-
-  return {
-    ...patient,
-    entries: patient.entries || [], // Ensures structural compatibility with old JSON entries
-  };
+  (patientData as Patient[]).push(newPatientEntry);
+  return newPatientEntry;
 };
 
 export default {
   getEntries,
   getNonSensitiveEntries,
+  findById,
   addPatient,
-  getPatientById,
 };
