@@ -79,14 +79,14 @@ const PatientListPage = ({ patients, setPatients }: Props) => {
         <TableBody>
           {Object.values(patients).map((patient: Patient) => (
             <TableRow key={patient.id}>
-              <TableCell>{patient.name}</TableCell>
+              <TableCell>
+                {/* The name only lives here, acting as the link */}
+                <Link to={`/patients/${patient.id}`}>{patient.name}</Link>
+              </TableCell>
               <TableCell>{patient.gender}</TableCell>
               <TableCell>{patient.occupation}</TableCell>
               <TableCell>
-                <HealthRatingBar showText={false} rating={1} />
-              </TableCell>
-              <TableCell>
-                <Link to={`/patients/${patient.id}`}>{patient.name}</Link>
+                <HealthRatingBar rating={1} showText={false} />
               </TableCell>
             </TableRow>
           ))}

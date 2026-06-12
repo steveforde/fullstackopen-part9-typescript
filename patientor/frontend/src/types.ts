@@ -19,6 +19,7 @@ export interface Patient {
   gender: Gender;
   ssn?: string;
   dateOfBirth?: string;
+  healthCheckRating: number;
   entries: Entry[];
 }
 
