@@ -17,17 +17,31 @@ router.post(
     res: Response<Patient | { error: unknown }>,
   ) => {
     try {
-      // Validate request body using our Zod parser helper
       const newPatientEntry = toNewPatientEntry(req.body);
       const addedEntry = patientService.addPatient(newPatientEntry);
       res.json(addedEntry);
     } catch (error: unknown) {
       if (error instanceof z.ZodError) {
-        // Send a 400 Bad Request detailing exactly which fields failed validation
         res.status(400).send({ error: error.issues });
       } else {
         res.status(400).send({ error: "Unknown error occurred" });
       }
+    }
+  },
+);
+
+router.get(
+  "/:id",
+  (
+    req: express.Request<{ id: string }>,
+    res: Response<Patient | { error: string }>,
+  ) => {
+    const patient = patientService.getPatientById(req.params.id);
+
+    if (patient) {
+      res.json(patient);
+    } else {
+      res.status(404).send({ error: "Patient not found" });
     }
   },
 );
