@@ -6,6 +6,6 @@
     "rootDir": "./src",
     "strict": true,
     "skipLibCheck": true
-  }, // <-- Make sure this comma is here!
+  },
   "include": ["src/**/*"]
 }

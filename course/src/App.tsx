@@ -1,38 +1,63 @@
-// 1. Interfaces & Type Layout
+// ==========================================
+// 1. INTERFACES & DISCRIMINATED UNION TYPE LAYOUT
+// ==========================================
+
+/**
+ * Base layout configuration shared by every course module variant
+ */
 interface CoursePartBase {
   name: string;
   exerciseCount: number;
 }
 
+/**
+ * Extended base layout that adds a description string attribute
+ */
 interface CoursePartDescription extends CoursePartBase {
   description: string;
 }
 
+/**
+ * Variant interface for a basic plain-text module layout
+ */
 interface CoursePartBasic extends CoursePartDescription {
-  kind: "basic";
+  kind: "basic"; // Discriminating literal string type attribute
 }
 
+/**
+ * Variant interface tracking team assignment groups and asset metrics
+ */
 interface CoursePartGroup extends CoursePartBase {
   groupProjectCount: number;
-  kind: "group";
+  kind: "group"; // Discriminating literal string type attribute
 }
 
+/**
+ * Variant interface referencing submission portals and reading materials
+ */
 interface CoursePartBackground extends CoursePartDescription {
   backgroundMaterial: string;
-  kind: "background";
+  kind: "background"; // Discriminating literal string type attribute
 }
 
+/**
+ * Variant interface tracking special required prerequisite engineering skills
+ */
 interface CoursePartSpecial extends CoursePartDescription {
   requirements: string[];
-  kind: "special";
+  kind: "special"; // Discriminating literal string type attribute
 }
 
+/**
+ * Master Discriminated Union type aggregating all individual structural variations
+ */
 type CoursePart =
   | CoursePartBasic
   | CoursePartGroup
   | CoursePartBackground
   | CoursePartSpecial;
 
+// Component configurations prop layout validation signatures
 interface HeaderProps {
   name: string;
 }
@@ -45,18 +70,35 @@ interface TotalProps {
   parts: CoursePart[];
 }
 
-// 2. Exhaustive Type Check Helper
+// ==========================================
+// 2. EXHAUSTIVE TYPE CHECKING UTILITY HELPER
+// ==========================================
+
+/**
+ * Compile-time exhaustiveness tracker ensuring switch conditions verify all union paths.
+ * If a new variant is added to CoursePart but skipped in a switch, TypeScript flags an error.
+ */
 const assertNever = (value: never): never => {
   throw new Error(
     `Unhandled discriminated union member: ${JSON.stringify(value)}`,
   );
 };
 
-// 3. Components
+// ==========================================
+// 3. MODULAR UI COMPONENTS
+// ==========================================
+
+/**
+ * Main application layout string title row header
+ */
 const Header = (props: HeaderProps) => {
   return <h1>{props.name}</h1>;
 };
 
+/**
+ * Structural Router Component evaluating current shape attributes
+ * and isolating specific UI layout trees per discriminated type.
+ */
 const Part = ({ part }: { part: CoursePart }) => {
   switch (part.kind) {
     case "basic":
@@ -104,10 +146,14 @@ const Part = ({ part }: { part: CoursePart }) => {
         </p>
       );
     default:
+      // Fallback hook verifying type-narrowing safety patterns strictly at compile-time
       return assertNever(part);
   }
 };
 
+/**
+ * Loop collection component iterating down full array arrays
+ */
 const Content = (props: ContentProps) => {
   return (
     <div>
@@ -118,6 +164,9 @@ const Content = (props: ContentProps) => {
   );
 };
 
+/**
+ * Numeric calculation foot row summarizing completed track elements total counts
+ */
 const Total = (props: TotalProps) => {
   const totalExercises = props.parts.reduce(
     (sum, part) => sum + part.exerciseCount,
@@ -130,9 +179,13 @@ const Total = (props: TotalProps) => {
   );
 };
 
-// 4. Main App Controller
+// ==========================================
+// 4. MAIN APP CONFIGURATION CONTROLLER
+// ==========================================
 const App = () => {
   const courseName = "Half Stack application development";
+
+  // Strongly-typed static core collection matching our strict union attributes rules
   const courseParts: CoursePart[] = [
     {
       name: "Fundamentals",

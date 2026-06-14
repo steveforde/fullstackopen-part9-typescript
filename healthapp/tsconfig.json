@@ -1,14 +1,37 @@
 {
   "compilerOptions": {
+    /* Set the JavaScript language version for emitted JavaScript code features */
     "target": "esnext",
+
+    /* Prevents TypeScript from emitting compiled JS files on disk (the dev runner or lint tools process it) */
     "noEmit": true,
+
+    /* --- Strict Linting Rules --- */
+
+    /* Raise an error when local variables are declared but never utilized in the code */
     "noUnusedLocals": true,
+
+    /* Raise an error when function parameters are defined but never utilized */
     "noUnusedParameters": true,
+
+    /* Guarantees that every code branch pathway inside a function explicitly returns a value */
     "noImplicitReturns": true,
+
+    /* Ensure switch blocks don't accidentally leak down execution paths due to missing breaks */
     "noFallthroughCasesInSwitch": true,
+
+    /* --- Module Resolution --- */
+
+    /* Matches standard, modern Node.js module loading mechanisms for ECMAScript Modules (ESM) */
     "module": "nodenext",
+
+    /* Emits additional JavaScript helpers to ease imports between CommonJS and ESM packages smoothly */
     "esModuleInterop": true,
+
+    /* Allows importing source utility files directly using .ts extensions inside your code */
     "allowImportingTsExtensions": true
   },
+
+  /* Tells the compiler to look through and monitor all TypeScript files in any subfolder of this project */
   "include": ["**/*.ts"]
 }

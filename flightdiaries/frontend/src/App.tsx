@@ -3,26 +3,37 @@ import type { DiaryEntry } from "./types";
 import { getAllDiaries, createDiary } from "./diaryService";
 import axios from "axios";
 
+/**
+ * Root Application Component
+ * Manages local diary log state, form field validations, and renders radio inputs.
+ */
 const App = () => {
+  // Application State Hooks
   const [diaries, setDiaries] = useState<DiaryEntry[]>([]);
-
-  // Controlled form input states
   const [date, setDate] = useState("");
   const [weather, setWeather] = useState("");
   const [visibility, setVisibility] = useState("");
   const [comment, setComment] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Allowed option arrays to cleanly map out our radio fields
+  // Allowed static option criteria strings used to accurately render mapped out input trees
   const visibilityOptions = ["great", "good", "ok", "poor"];
   const weatherOptions = ["sunny", "rainy", "cloudy", "stormy", "windy"];
 
+  /**
+   * Component Mounting Hook
+   * Hydrates local state by firing an initial GET query payload fetching existing diaries.
+   */
   useEffect(() => {
     getAllDiaries().then((data) => {
       setDiaries(data);
     });
   }, []);
 
+  /**
+   * Submission Event Interceptor
+   * Dispatches newly specified creation payloads to backend storage, featuring deep Zod error parser handles.
+   */
   const diaryCreation = async (event: React.SyntheticEvent) => {
     event.preventDefault();
 
@@ -33,34 +44,41 @@ const App = () => {
         visibility,
         comment,
       });
+
+      // Update data views smoothly using pure array concatenation patterns
       setDiaries(diaries.concat(addedEntry));
 
-      // Reset fields on successful addition
+      // Clear input fields and errors completely upon successful payload dispatching
       setDate("");
       setWeather("");
       setVisibility("");
       setComment("");
       setErrorMessage("");
     } catch (error: unknown) {
+      // Catch bad response configurations originating directly from network data transactions
       if (axios.isAxiosError(error) && error.response) {
         const data = error.response.data;
 
+        // Verify if error structure represents raw JSON error reporting returned via the Zod validation middleware
         if (data && typeof data === "object" && "error" in data) {
           try {
+            // Unpack stringified error metadata issues arrays sent back by the backend middleware
             const zodErrors = JSON.parse(data.error as string);
             if (Array.isArray(zodErrors) && zodErrors.length > 0) {
               const firstIssue = zodErrors[0];
-              const fieldName = firstIssue.path[0];
+              const fieldName = firstIssue.path[0]; // Isolate the targeted error location (e.g. 'weather')
 
               let invalidValue = "";
               if (fieldName === "visibility") invalidValue = visibility;
               if (fieldName === "weather") invalidValue = weather;
 
+              // Display localized warnings specifying exactly what data failed input rules
               setErrorMessage(`Incorrect ${fieldName}: ${invalidValue}`);
             } else {
               setErrorMessage("Validation failed on the backend.");
             }
           } catch {
+            // Fall back to printing raw message text descriptions if JSON transformations fail
             setErrorMessage(String(data.error));
           }
         } else if (typeof data === "string") {
@@ -76,7 +94,6 @@ const App = () => {
   };
 
   return (
-    // Max-width keeps it compact, margin-left 0 aligns everything cleanly to the left side
     <div
       style={{
         padding: "20px",
@@ -87,6 +104,7 @@ const App = () => {
     >
       <h2>Add new entry</h2>
 
+      {/* Conditional Error Display Panel */}
       {errorMessage && (
         <p style={{ color: "red", fontWeight: "bold" }}>
           Error: {errorMessage}
@@ -94,6 +112,7 @@ const App = () => {
       )}
 
       <form onSubmit={diaryCreation} style={{ marginBottom: "30px" }}>
+        {/* Date Input Field */}
         <div style={{ marginBottom: "10px" }}>
           <span style={{ marginRight: "10px" }}>date:</span>
           <input
@@ -104,7 +123,7 @@ const App = () => {
           />
         </div>
 
-        {/* Visibility Radio Buttons Row */}
+        {/* Visibility Controlled Radio Options Selector */}
         <div
           style={{
             display: "flex",
@@ -136,7 +155,7 @@ const App = () => {
           ))}
         </div>
 
-        {/* Weather Radio Buttons Row */}
+        {/* Weather Controlled Radio Options Selector */}
         <div
           style={{
             display: "flex",
@@ -168,6 +187,7 @@ const App = () => {
           ))}
         </div>
 
+        {/* General Comment Narrative text node input */}
         <div style={{ marginBottom: "15px" }}>
           <span style={{ marginRight: "10px" }}>comment:</span>
           <input value={comment} onChange={(e) => setComment(e.target.value)} />
@@ -183,6 +203,7 @@ const App = () => {
 
       <hr style={{ border: "0.5px solid #ccc", margin: "20px 0" }} />
 
+      {/* Historical Logs List Layout Rendering Grid */}
       <h2>Diary entries</h2>
       {diaries.map((diary) => (
         <div key={diary.id} style={{ marginBottom: "20px" }}>
