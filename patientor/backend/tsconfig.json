@@ -1,16 +1,39 @@
 {
   "compilerOptions": {
+    /* Set the JavaScript language version for emitted JavaScript code features */
     "target": "ES2022",
+
+    /* Specify what module code is generated (NodeNext matches modern Node.js ESM rules) */
     "module": "NodeNext",
+
+    /* Determine how TypeScript looks up a file from a given absolute or relative import path statement */
     "moduleResolution": "NodeNext",
+
+    /* Allow importing modules that do not have a default export explicitly declared in their source */
     "allowSyntheticDefaultImports": true,
+
+    /* Enable importing static .json configuration files directly as typed structured objects */
     "resolveJsonModule": true,
+
+    /* Emit additional helper logic to ensure compatibility when importing CommonJS modules inside ESM code */
     "esModuleInterop": true,
+
+    /* Enable a broad range of strong type-checking behaviors to maximize code safety guarantees */
     "strict": true,
+
+    /* Skip type-checking declaration files (*.d.ts) to speed up compilation cycles significantly */
     "skipLibCheck": true,
+
+    /* Specify the root source directory location where your raw TypeScript files live */
     "rootDir": "./src",
+
+    /* Specify the output directory location where compiled pure JavaScript output files are saved */
     "outDir": "./build",
+
+    /* Generate lookup .js.map source map files to enable accurate runtime line-number debugging */
     "sourceMap": true
   },
+
+  /* Specify what files and subfolders the TypeScript compiler should actively track and compile */
   "include": ["src/**/*"]
 }

@@ -1,16 +1,28 @@
 import { z } from "zod";
 import { Gender } from "./types.js";
 
-// Define the schema for a new patient entry
+/**
+ * Zod Runtime Validation Schema
+ * Declares the strict shape, types, and constraints required for creating a fresh patient record.
+ */
 export const NewPatientSchema = z.object({
   name: z.string(),
-  dateOfBirth: z.string().date(), // Validates YYYY-MM-DD strings automatically
+  // Built-in Zod validator ensuring the string adheres strictly to an ISO 8601 YYYY-MM-DD format
+  dateOfBirth: z.string().date(),
   ssn: z.string(),
-  gender: z.nativeEnum(Gender), // Validates against our Gender enum values
+  // Leverages nativeEnum to restrict valid incoming strings strictly to 'male' | 'female' | 'other'
+  gender: z.nativeEnum(Gender),
   occupation: z.string(),
 });
 
-// Helper function to parse and validate the request body
+/**
+ * Parsing Helper Utility
+ * Intercepts unverified payload structures from the express route context at runtime.
+ * * @param {unknown} object - Raw request body object payload requiring structural processing
+ * @returns {NewPatientEntry} Fully verified patient entity stripped of unrecognized properties
+ * @throws {ZodError} If any structural rules or data type validations fail constraints
+ */
 export const toNewPatientEntry = (object: unknown) => {
+  // .parse matches the layout rules, strips unlisted keys, and strips out hidden objects
   return NewPatientSchema.parse(object);
 };

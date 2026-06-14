@@ -1,25 +1,58 @@
 {
   "compilerOptions": {
+    /* Set the JavaScript language version for emitted JavaScript code features */
     "target": "ES2020",
+
+    /* Controls how class fields are compiled (true matches standard ECMAScript behavior) */
     "useDefineForClassFields": true,
+
+    /* Specify library files to be included in the compilation (includes browser DOM types) */
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
+
+    /* Specify what module code is generated for the bundler to process */
     "module": "ESNext",
+
+    /* Skip type-checking declaration files (*.d.ts) to speed up compilation cycles */
     "skipLibCheck": true,
 
-    /* Bundler mode */
+    /* --- Bundler mode --- */
+
+    /* Instructs TypeScript to leave module resolution to modern bundlers like Vite or Webpack */
     "moduleResolution": "bundler",
+
+    /* Allows importing source files directly using .ts and .tsx extensions */
     "allowImportingTsExtensions": true,
+
+    /* Enable importing static .json files directly as typed structured objects */
     "resolveJsonModule": true,
+
+    /* Ensures every file can be safely transpiled independently without deep dependency graph lookups */
     "isolatedModules": true,
+
+    /* Prevents TypeScript from emitting compiled JS files on disk (Vite handles the emission) */
     "noEmit": true,
+
+    /* Controls how JSX constructs are transformed into standard elements in React */
     "jsx": "react-jsx",
 
-    /* Linting */
+    /* --- Linting --- */
+
+    /* Enable a broad range of strong type-checking behaviors to maximize code safety guarantees */
     "strict": true,
+
+    /* Raise an error when local variables are declared but never utilized in the code */
     "noUnusedLocals": true,
+
+    /* Raise an error when function configuration parameters are defined but never utilized */
     "noUnusedParameters": true,
+
+    /* Ensure switch blocks don't accidentally leak down execution paths due to missing breaks */
     "noFallthroughCasesInSwitch": true
   },
+
+  /* Specify the source folder where your application code files reside */
   "include": ["src"],
+
+  /* References separate configuration layouts managing node-specific build tool tasks */
   "references": [{ "path": "./tsconfig.node.json" }]
 }

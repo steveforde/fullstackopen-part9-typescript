@@ -1,11 +1,24 @@
 {
   "compilerOptions": {
+    /* Set the JavaScript language version for emitted JavaScript features */
     "target": "ES2022",
+
+    /* Specify what module code is generated (NodeNext is required for modern Node.js ESM) */
     "module": "NodeNext",
+
+    /* Determine how TypeScript looks up a file from a given import path statement */
     "moduleResolution": "NodeNext",
+
+    /* Disable emitting compiler output files like compiled .js files (used when only type-checking via Vite/ts-node) */
     "noEmit": true,
+
+    /* Enable a broad range of strong type-checking behaviors to ensure code safety */
     "strict": true,
+
+    /* Allow expressions and declarations with an implied 'any' type instead of throwing errors */
     "noImplicitAny": false,
+
+    /* Specify type declaration files to be included in compilation (loads global Node.js environment types) */
     "types": ["node"]
   }
 }
