@@ -4,26 +4,27 @@ import { BrowserRouter as Router, Route, Link, Routes } from "react-router-dom";
 import { Button, Divider, Container, Typography } from "@mui/material";
 
 import { apiBaseUrl } from "./constants";
-import { Patient } from "./types";
+import { Patient, Diagnosis } from "./types";
 
 import patientService from "./services/patients";
+// Crucial: Ensure this is imported cleanly as an object wrapper
+import diagnosesService from "./services/diagnoses";
 import PatientListPage from "./components/PatientListPage";
 import PatientDetailPage from "./components/PatientDetailPage";
 
 /**
  * Root Application Component
- * Manages the global patient state grid hydration and configures Client-Side Routing (SPA).
+ * Manages global state grids for patients and diagnoses, configuring client-side routing.
  */
 const App = () => {
-  // Global React state engine holding the master array of brief patient profile entries
   const [patients, setPatients] = useState<Patient[]>([]);
+  const [diagnoses, setDiagnoses] = useState<Diagnosis[]>([]);
 
   /**
    * Initial Mount Lifecycle Effect
-   * Fires baseline network accessibility checks and extracts remote datasets.
+   * Fires baseline network accessibility checks and extracts remote lookups.
    */
   useEffect(() => {
-    // Fire-and-forget backend application connectivity check ('void' suppresses floating promise warnings)
     void axios.get<void>(`${apiBaseUrl}/ping`);
 
     const fetchPatientList = async () => {
@@ -31,29 +32,31 @@ const App = () => {
       setPatients(patientsData);
     };
 
+    const fetchDiagnosesList = async () => {
+      // Calling our dedicated service which reaches out to port 3001
+      const diagnosesData = await diagnosesService.getAll();
+      setDiagnoses(diagnosesData);
+    };
+
     void fetchPatientList();
-  }, []); // Empty dependency array ensures execution fires strictly once on initial page compilation mount
+    void fetchDiagnosesList();
+  }, []);
 
   return (
     <div className="App">
-      {/* BrowserRouter contextual wrapper supplying historical state capabilities down the virtual DOM tree */}
       <Router>
         <Container>
-          {/* Main App branding header */}
           <Typography variant="h3" sx={{ marginBottom: "0.5em" }}>
             Patientor
           </Typography>
 
-          {/* Material UI Button variant component re-cast directly into a React Router DOM declarative Link */}
           <Button component={Link} to="/" variant="contained" color="primary">
             Home
           </Button>
 
           <Divider sx={{ marginY: 2 }} />
 
-          {/* Declarative switch framework swapping rendering panels matching current address bar window state */}
           <Routes>
-            {/* Index Main Landing Dashboard Layout */}
             <Route
               path="/"
               element={
@@ -63,8 +66,10 @@ const App = () => {
                 />
               }
             />
-            {/* Deep Dynamic Patient Folder Viewport */}
-            <Route path="/patients/:id" element={<PatientDetailPage />} />
+            <Route
+              path="/patients/:id"
+              element={<PatientDetailPage diagnoses={diagnoses} />}
+            />
           </Routes>
         </Container>
       </Router>
