@@ -14,11 +14,24 @@ export enum Gender {
 }
 
 /**
- * Placeholder interface representing historical medical event logs.
- * This structure will be expanded with variant configurations in future steps.
+ * Core Medical Record Base Interface
+ * Defines common properties shared across all variant clinical event configurations.
  */
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface Entry {}
+export interface BaseEntry {
+  id: string;
+  date: string;
+  description: string;
+  specialist: string;
+  diagnosisCodes?: Array<Diagnosis["code"]>; // Updated property name to match backend JSON
+}
+
+/**
+ * Temporary Extended Entry Type
+ * For Step 4, we extend the base properties to allow flexible presentation of medical events.
+ */
+export interface Entry extends BaseEntry {
+  // Variant configurations (e.g., HealthCheck, OccupationalHealthcare, Hospital) will be added here in upcoming steps
+}
 
 /**
  * Core Patient Layout Shape
@@ -31,14 +44,12 @@ export interface Patient {
   gender: Gender;
   ssn?: string;
   dateOfBirth?: string;
-  healthCheckRating: number;
-  entries: Entry[];
+  entries: Entry[]; // Typed array processing our newly updated Entry structural layout
 }
 
 /**
  * Form Submission Payload Utility Shape
  * Creates a dedicated utility type by completely omitting backend-managed properties
- * ('id' and 'entries') from the core Patient interface. This shape precisely matches
- * the structure required by the form creation payload context.
+ * ('id' and 'entries') from the core Patient interface.
  */
 export type PatientFormValues = Omit<Patient, "id" | "entries">;

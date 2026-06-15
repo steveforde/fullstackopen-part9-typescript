@@ -75,14 +75,44 @@ const PatientDetailPage = () => {
       </Box>
 
       {/* Historical Medical Incidents Section */}
-      <Typography variant="h5" sx={{ mt: 4, fontWeight: "bold" }}>
-        Entries
+      <Typography variant="h5" sx={{ mt: 4, mb: 2, fontWeight: "bold" }}>
+        entries
       </Typography>
 
-      {/* Entries tracking layout will expand here in upcoming steps */}
-      <Typography variant="body2" color="text.secondary">
-        No entries recorded yet.
-      </Typography>
+      {/* Conditional Rendering: Check if the entry logs array contains records */}
+      {patient.entries.length === 0 ? (
+        <Typography variant="body2" color="text.secondary">
+          No entries recorded yet.
+        </Typography>
+      ) : (
+        patient.entries.map((entry) => (
+          <Box key={entry.id} sx={{ mb: 3 }}>
+            {/* Entry Header Block containing date string */}
+            <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+              {entry.date}
+            </Typography>
+
+            {/* Entry Description Block formatted in italics */}
+            <Typography
+              variant="body1"
+              sx={{ fontStyle: "italic", color: "text.secondary" }}
+            >
+              {entry.description}
+            </Typography>
+
+            {/* Conditional Sub-List Rendering: Loops through diagnosis tracking codes if array exists */}
+            {entry.diagnosisCodes && entry.diagnosisCodes.length > 0 && (
+              <Box component="ul" sx={{ mt: 1, pl: 3 }}>
+                {entry.diagnosisCodes.map((code) => (
+                  <Box component="li" key={code} sx={{ typography: "body2" }}>
+                    {code}
+                  </Box>
+                ))}
+              </Box>
+            )}
+          </Box>
+        ))
+      )}
     </Box>
   );
 };
