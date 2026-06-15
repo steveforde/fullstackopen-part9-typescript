@@ -29,5 +29,10 @@
   {
     "code": "M51.2",
     "name": "Other specified intervertebral disc displacement"
+  },
+
+  {
+    "code": "S62.5",
+    "name": "Fracture of thumb"
   }
 ]
