@@ -10,12 +10,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v4
         with:
-          node-version: "24"
+          node-version: "20"
 
       - name: Install patientor backend dependencies
         working-directory: ./patientor/backend
@@ -41,9 +41,22 @@ jobs:
         working-directory: ./patientor-tests
         run: npm install
 
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ hashFiles('patientor-tests/package-lock.json') }}
+
       - name: Install Playwright browsers
         working-directory: ./patientor-tests
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright system deps only
+        working-directory: ./patientor-tests
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
 
       - name: Wait for servers to start
         run: npx wait-on http://localhost:3001/api/ping http://localhost:5173 --timeout 60000
@@ -53,7 +66,7 @@ jobs:
         run: npm test
 
       - name: Upload test report
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-report
