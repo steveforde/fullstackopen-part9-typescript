@@ -1,6 +1,9 @@
 import patientData from "../data/patients.json" with { type: "json" };
-import { Patient, NonSensitivePatient, NewPatient } from "../types.js";
+import { Patient, NonSensitivePatient, NewPatient, Entry } from "../types.js";
 import { v4 as uuid } from "uuid";
+
+// Local helper helper type to represent a new entry payload missing its ID
+type NewEntry = Omit<Entry, "id">;
 
 /**
  * Fetch all patients in their raw form from the data store
@@ -56,9 +59,34 @@ const addPatient = (entry: NewPatient): Patient => {
   return newPatientEntry;
 };
 
+/**
+ * Step 7 Data Processor: Generates a unique ID, mutates the targeted patient's entry log,
+ * and passes the compiled medical instance object straight back to the execution route.
+ * @param {Patient} patient - Target parent database document configuration profile reference
+ * @param {NewEntry} entry - Validated schema entry attributes compiled from route constraints
+ * @returns {Entry} Fully mapped diagnostic or inspection entity payload
+ */
+/**
+ * Step 7 Data Processor: Generates a unique ID, mutates the targeted patient's entry log,
+ * and passes the compiled medical instance object straight back to the execution route.
+ * @param {Patient} patient - Target parent database document configuration profile reference
+ * @param {Omit<Entry, "id">} entry - Validated schema entry attributes compiled from route constraints
+ * @returns {Entry} Fully mapped diagnostic or inspection entity payload
+ */
+const addEntry = (patient: Patient, entry: Omit<Entry, "id">): Entry => {
+  const newEntry: Entry = {
+    id: uuid(),
+    ...entry,
+  } as Entry; // Type assertion satisfies the structural union spreading constraint safely
+
+  patient.entries.push(newEntry);
+  return newEntry;
+};
+
 export default {
   getEntries,
   getNonSensitiveEntries,
   findById,
   addPatient,
+  addEntry,
 };

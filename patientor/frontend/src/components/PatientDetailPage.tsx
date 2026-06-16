@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Typography, Box } from "@mui/material";
+import { Typography, Box, Button } from "@mui/material";
 import MaleIcon from "@mui/icons-material/Male";
 import FemaleIcon from "@mui/icons-material/Female";
 import TransgenderIcon from "@mui/icons-material/Transgender";
 
-import { Patient, Diagnosis } from "../types";
+import { Patient, Diagnosis, EntryFormValues } from "../types";
 import patientService from "../services/patients";
 import { EntryDetails } from "./EntryDetails";
+import { AddEntryForm } from "./AddEntryForm";
 
 interface Props {
   diagnoses: Diagnosis[];
@@ -21,6 +22,7 @@ interface Props {
 const PatientDetailPage = ({ diagnoses }: Props) => {
   const { id } = useParams<{ id: string }>();
   const [patient, setPatient] = useState<Patient | null>(null);
+  const [showForm, setShowForm] = useState<boolean>(false);
 
   /**
    * Local Lifecycle Hook
@@ -47,6 +49,29 @@ const PatientDetailPage = ({ diagnoses }: Props) => {
         return <FemaleIcon color="error" />;
       default:
         return <TransgenderIcon color="action" />;
+    }
+  };
+
+  /**
+   * Submits entry values to the backend service.
+   * Step 8: Updates local state to instantly render the new card layout.
+   */
+  const handleFormSubmit = async (values: EntryFormValues) => {
+    if (!id || !patient) return;
+    try {
+      const newEntry = await patientService.createEntry(id, values);
+      console.log("Successfully saved entry:", newEntry);
+
+      // Step 8: Update state by appending the new entry to the existing entries array
+      setPatient({
+        ...patient,
+        entries: patient.entries.concat(newEntry),
+      });
+
+      // Hide form upon successful submission
+      setShowForm(false);
+    } catch (error) {
+      console.error("Failed to add entry:", error);
     }
   };
 
@@ -93,6 +118,23 @@ const PatientDetailPage = ({ diagnoses }: Props) => {
         patient.entries.map((entry) => (
           <EntryDetails key={entry.id} entry={entry} diagnoses={diagnoses} />
         ))
+      )}
+
+      {/* Toggle View Controller between the Submission Form and Launch Action Trigger */}
+      {showForm ? (
+        <AddEntryForm
+          onCancel={() => setShowForm(false)}
+          onSubmit={handleFormSubmit}
+        />
+      ) : (
+        <Button
+          variant="contained"
+          color="primary"
+          sx={{ mt: 2, mb: 4 }}
+          onClick={() => setShowForm(true)}
+        >
+          ADD NEW ENTRY
+        </Button>
       )}
     </Box>
   );

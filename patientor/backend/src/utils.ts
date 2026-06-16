@@ -1,28 +1,73 @@
 import { z } from "zod";
 import { Gender } from "./types.js";
 
-/**
- * Zod Runtime Validation Schema
- * Declares the strict shape, types, and constraints required for creating a fresh patient record.
- */
+// --- Patient Validation ---
+
 export const NewPatientSchema = z.object({
   name: z.string(),
-  // Built-in Zod validator ensuring the string adheres strictly to an ISO 8601 YYYY-MM-DD format
   dateOfBirth: z.string().date(),
   ssn: z.string(),
-  // Leverages nativeEnum to restrict valid incoming strings strictly to 'male' | 'female' | 'other'
   gender: z.nativeEnum(Gender),
   occupation: z.string(),
 });
 
-/**
- * Parsing Helper Utility
- * Intercepts unverified payload structures from the express route context at runtime.
- * * @param {unknown} object - Raw request body object payload requiring structural processing
- * @returns {NewPatientEntry} Fully verified patient entity stripped of unrecognized properties
- * @throws {ZodError} If any structural rules or data type validations fail constraints
- */
 export const toNewPatientEntry = (object: unknown) => {
-  // .parse matches the layout rules, strips unlisted keys, and strips out hidden objects
   return NewPatientSchema.parse(object);
+};
+
+// --- Entry Validation (Step 7) ---
+
+// Base criteria shared across all entry types
+const BaseEntrySchema = z.object({
+  description: z.string().min(1, "Description is required"),
+  date: z.string().date("Invalid date format (YYYY-MM-DD)"),
+  specialist: z.string().min(1, "Specialist name is required"),
+  diagnosisCodes: z.array(z.string()).optional(),
+});
+
+// 1. HealthCheck Schema using the union trick from your course screenshot
+const HealthCheckSchema = BaseEntrySchema.extend({
+  type: z.literal("HealthCheck"),
+  healthCheckRating: z.union([
+    z.literal(0),
+    z.literal(1),
+    z.literal(2),
+    z.literal(3),
+  ]),
+});
+
+// 2. Hospital Schema
+const HospitalSchema = BaseEntrySchema.extend({
+  type: z.literal("Hospital"),
+  discharge: z.object({
+    date: z.string().date("Invalid discharge date format"),
+    criteria: z.string().min(1, "Discharge criteria is required"),
+  }),
+});
+
+// 3. OccupationalHealthcare Schema
+const OccupationalHealthcareSchema = BaseEntrySchema.extend({
+  type: z.literal("OccupationalHealthcare"),
+  employerName: z.string().min(1, "Employer name is required"),
+  sickLeave: z
+    .object({
+      startDate: z.string().date("Invalid sick leave start date"),
+      endDate: z.string().date("Invalid sick leave end date"),
+    })
+    .optional(),
+});
+
+// Combined Union Schema matching the Step 7 backend endpoint specifications
+export const NewEntrySchema = z.union([
+  HealthCheckSchema,
+  HospitalSchema,
+  OccupationalHealthcareSchema,
+]);
+
+/**
+ * Parsing Helper for New Entries
+ * @param object - Raw req.body submission data from the API endpoint
+ */
+export const toNewEntry = (object: unknown) => {
+  return NewEntrySchema.parse(object);
 };

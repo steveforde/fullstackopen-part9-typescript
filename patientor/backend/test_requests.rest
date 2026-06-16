@@ -31,3 +31,28 @@ GET http://localhost:3001/api/patients
 
 ### Get John McClane
 GET http://localhost:3001/api/patients/d2773336-f723-11e9-8f0b-362b9be15567
+
+
+### Test Step 7: Add a valid HealthCheck Entry to Dana Scully
+POST http://localhost:3001/api/patients/d2773716-f723-11e9-8f0b-362b9be15567/entries
+Content-Type: application/json
+
+{
+  "date": "2026-06-16",
+  "specialist": "Dr. Fox Mulder",
+  "type": "HealthCheck",
+  "description": "Routine checkup to monitor extreme exhaustion after field operations.",
+  "healthCheckRating": 1
+}
+
+### Test Zod Error: Try submitting an invalid rating (Should return 400 Bad Request)
+POST http://localhost:3001/api/patients/d2773716-f723-11e9-8f0b-362b9be15567/entries
+Content-Type: application/json
+
+{
+  "date": "2026-06-16",
+  "specialist": "Dr. Fox Mulder",
+  "type": "HealthCheck",
+  "description": "This should fail validation completely.",
+  "healthCheckRating": 5
+}

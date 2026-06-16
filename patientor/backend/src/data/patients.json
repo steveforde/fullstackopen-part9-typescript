@@ -56,29 +56,34 @@
   {
     "id": "d2773716-f723-11e9-8f0b-362b9be15567",
     "name": "Dana Scully",
-    "dateOfBirth": "1974-01-05",
+    "dateOfBirth": "1964-02-23",
     "ssn": "050174-432N",
     "gender": "female",
     "occupation": "Forensic Pathologist",
     "entries": [
       {
-        "id": "b4f4eca1-050f-4343-a0e8-aef4ccbe1b1f",
+        "id": "d811e46d-70b3-4d90-b090-4535c7cf8fb1",
         "date": "2019-10-20",
         "specialist": "MD House",
         "type": "HealthCheck",
-        "description": "Yearly control visit. Chlamydia test negative.",
+        "description": "Yearly control visit. Cholesterol levels back to normal.",
         "healthCheckRating": 0
       },
       {
-        "id": "nc53b566-3411-457c-99ff-bcde231c2350",
-        "date": "2019-11-01",
-        "specialist": "Dr Sharman",
-        "type": "Hospital",
-        "description": "Patient complains of unremitting fatigue.",
-        "discharge": {
-          "date": "2019-11-05",
-          "criteria": "Patient recovered strike rate."
-        }
+        "id": "f72311e9-8f0b-362b-9be1-5567c7cf8fb2",
+        "date": "2019-09-10",
+        "specialist": "MD House",
+        "type": "OccupationalHealthcare",
+        "employerName": "FBI",
+        "description": "Prescriptions renewed."
+      },
+      {
+        "id": "b2a4c1d8-311e-4b90-a090-6735c7cf8fb3",
+        "date": "2018-10-05",
+        "specialist": "MD House",
+        "type": "HealthCheck",
+        "description": "Yearly control visit. Due to high cholesterol levels recommended to eat more vegetables.",
+        "healthCheckRating": 2
       }
     ]
   },

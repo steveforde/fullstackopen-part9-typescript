@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Patient, PatientFormValues } from "../types";
+import { Patient, PatientFormValues, Entry, EntryFormValues } from "../types";
 import { apiBaseUrl } from "../constants";
 
 /**
@@ -7,7 +7,6 @@ import { apiBaseUrl } from "../constants";
  * @returns {Promise<Patient[]>} An array of full patient objects
  */
 const getAll = async () => {
-  // Uses Axios generics to ensure the response payload matches the Patient array type
   const { data } = await axios.get<Patient[]>(`${apiBaseUrl}/patients`);
   return data;
 };
@@ -32,8 +31,23 @@ const getById = async (id: string) => {
   return data;
 };
 
+/**
+ * Step 7 Frontend API Trigger: Submit a fresh medical entry to a target patient record
+ * @param {string} patientId - The target patient's unique UUID string
+ * @param {EntryFormValues} object - The raw input form payload for the new entry
+ * @returns {Promise<Entry>} The fully formed entry object returned from the backend data engine
+ */
+const createEntry = async (patientId: string, object: EntryFormValues) => {
+  const { data } = await axios.post<Entry>(
+    `${apiBaseUrl}/patients/${patientId}/entries`,
+    object,
+  );
+  return data;
+};
+
 export default {
   getAll,
   create,
   getById,
+  createEntry,
 };

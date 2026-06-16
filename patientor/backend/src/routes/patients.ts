@@ -1,7 +1,7 @@
 import express, { Response } from "express";
 import patientService from "../services/patientService.js";
-import { toNewPatientEntry } from "../utils.js";
-import { Patient, NewPatientEntry, NewPatient } from "../types.js";
+import { toNewPatientEntry, toNewEntry } from "../utils.js";
+import { Patient, NewPatientEntry, NewPatient, Entry } from "../types.js";
 import { z } from "zod";
 
 // Initialize an isolated Express Router instance for modular patient endpoint handling
@@ -64,6 +64,42 @@ router.post(
         res.status(400).send({ error: error.issues });
       } else {
         res.status(400).send({ error: "Unknown error occurred" });
+      }
+    }
+  },
+);
+
+/**
+ * @route   POST /api/patients/:id/entries
+ * @desc    Step 7 Backend Endpoint: Validate and append a medical entry to a target patient record
+ * @access  Public
+ */
+router.post(
+  "/:id/entries",
+  (
+    req: express.Request<{ id: string }>,
+    res: Response<Entry | { error: unknown }>,
+  ) => {
+    try {
+      // 1. Check if patient exists first before validating the payload shape
+      const patient = patientService.findById(req.params.id);
+      if (!patient) {
+        res.status(404).send({ error: "Patient not found" });
+        return;
+      }
+
+      // 2. Parse and validate the incoming entry structure via our Zod union schema
+      const validatedNewEntry = toNewEntry(req.body);
+
+      // 3. Delegate generation and mutation tasks to the service data engine
+      const addedEntry = patientService.addEntry(patient, validatedNewEntry);
+
+      res.json(addedEntry);
+    } catch (error: unknown) {
+      if (error instanceof z.ZodError) {
+        res.status(400).send({ error: error.issues });
+      } else {
+        res.status(400).send({ error: "An unexpected error occurred" });
       }
     }
   },
