@@ -1,69 +1,123 @@
 import { useState, SyntheticEvent } from "react";
 import {
-  Box,
   TextField,
+  InputLabel,
+  MenuItem,
+  Select,
   Button,
   Typography,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Alert,
+  Box,
+  OutlinedInput,
+  SelectChangeEvent,
 } from "@mui/material";
-import { EntryFormValues } from "../types";
+import { LocalHospital, MedicalServices, Work } from "@mui/icons-material";
+import { EntryFormValues, Diagnosis } from "../types";
 
 interface Props {
   onCancel: () => void;
   onSubmit: (values: EntryFormValues) => void;
-  error?: string;
+  diagnoses: Diagnosis[];
 }
 
-export const AddEntryForm = ({ onCancel, onSubmit, error }: Props) => {
-  const [type, setType] = useState<"HealthCheck" | "Hospital">("HealthCheck");
+export const AddEntryForm = ({ onCancel, onSubmit, diagnoses }: Props) => {
+  const [entryType, setEntryType] = useState<
+    "HealthCheck" | "Hospital" | "OccupationalHealthcare"
+  >("HealthCheck");
+
+  // Base fields
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
   const [specialist, setSpecialist] = useState("");
-  const [diagnosisCodesInput, setDiagnosisCodesInput] = useState("");
+  const [diagnosisCodes, setDiagnosisCodes] = useState<
+    Array<Diagnosis["code"]>
+  >([]);
 
-  // HealthCheck specific state
+  // HealthCheck specific fields
   const [healthCheckRating, setHealthCheckRating] = useState<number>(0);
 
-  // Hospital specific state
+  // Hospital specific fields
   const [dischargeDate, setDischargeDate] = useState("");
   const [dischargeCriteria, setDischargeCriteria] = useState("");
+
+  // OccupationalHealthcare specific fields
+  const [employerName, setEmployerName] = useState("");
+  const [sickLeaveStartDate, setSickLeaveStartDate] = useState("");
+  const [sickLeaveEndDate, setSickLeaveEndDate] = useState("");
+
+  const handleDiagnosisChange = (
+    event: SelectChangeEvent<typeof diagnosisCodes>,
+  ) => {
+    const {
+      target: { value },
+    } = event;
+    setDiagnosisCodes(typeof value === "string" ? value.split(",") : value);
+  };
 
   const addEntry = (event: SyntheticEvent) => {
     event.preventDefault();
 
-    const diagnosisCodes = diagnosisCodesInput
-      ? diagnosisCodesInput
-          .split(",")
-          .map((code) => code.trim())
-          .filter(Boolean)
-      : undefined;
-
-    const baseValues = {
+    const baseData = {
       description,
       date,
       specialist,
-      ...(diagnosisCodes && { diagnosisCodes }),
+      diagnosisCodes: diagnosisCodes.length > 0 ? diagnosisCodes : undefined,
     };
 
-    if (type === "HealthCheck") {
+    if (entryType === "HealthCheck") {
       onSubmit({
-        ...baseValues,
+        ...baseData,
         type: "HealthCheck",
         healthCheckRating,
       } as EntryFormValues);
-    } else {
+    } else if (entryType === "Hospital") {
       onSubmit({
-        ...baseValues,
+        ...baseData,
         type: "Hospital",
         discharge: {
           date: dischargeDate,
           criteria: dischargeCriteria,
         },
       } as EntryFormValues);
+    } else if (entryType === "OccupationalHealthcare") {
+      const sickLeave =
+        sickLeaveStartDate && sickLeaveEndDate
+          ? { startDate: sickLeaveStartDate, endDate: sickLeaveEndDate }
+          : undefined;
+
+      onSubmit({
+        ...baseData,
+        type: "OccupationalHealthcare",
+        employerName,
+        sickLeave,
+      } as EntryFormValues);
+    }
+  };
+
+  const renderHeader = () => {
+    switch (entryType) {
+      case "HealthCheck":
+        return (
+          <Box display="flex" alignItems="center" gap={1}>
+            <MedicalServices color="primary" />
+            <Typography variant="h6">New HealthCheck Entry</Typography>
+          </Box>
+        );
+      case "Hospital":
+        return (
+          <Box display="flex" alignItems="center" gap={1}>
+            <LocalHospital color="error" />
+            <Typography variant="h6">New Hospital Entry</Typography>
+          </Box>
+        );
+      case "OccupationalHealthcare":
+        return (
+          <Box display="flex" alignItems="center" gap={1}>
+            <Work color="action" />
+            <Typography variant="h6">
+              New OccupationalHealthcare Entry
+            </Typography>
+          </Box>
+        );
     }
   };
 
@@ -71,148 +125,177 @@ export const AddEntryForm = ({ onCancel, onSubmit, error }: Props) => {
     <Box
       sx={{
         border: "2px dashed #ccc",
+        padding: 2,
         borderRadius: 2,
-        p: 2,
-        mb: 3,
-        bgcolor: "#fff",
+        marginBottom: 2,
       }}
     >
-      {/* Fixed Header Name - Matches Screenshot 2026-06-16 at 12.29.55.png exactly */}
-      <Typography variant="h6" sx={{ mb: 2, fontWeight: "bold" }}>
-        New HealthCheck Entry
-      </Typography>
-
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
+      {renderHeader()}
 
       <form onSubmit={addEntry}>
-        <FormControl fullWidth sx={{ mb: 2 }}>
-          <InputLabel id="entry-type-label">Entry Type</InputLabel>
-          <Select
-            labelId="entry-type-label"
-            value={type}
-            label="Entry Type"
-            onChange={({ target }) =>
-              setType(target.value as "HealthCheck" | "Hospital")
-            }
-          >
-            <MenuItem value="HealthCheck">HealthCheck</MenuItem>
-            <MenuItem value="Hospital">Hospital</MenuItem>
-          </Select>
-        </FormControl>
-
-        {/* Date Field is FIRST - matching the instruction layout */}
-        <TextField
-          type="date"
-          label="Date"
+        <InputLabel style={{ marginTop: 20 }}>Entry Type</InputLabel>
+        <Select
           fullWidth
+          value={entryType}
+          onChange={({ target }) => setEntryType(target.value as any)}
+        >
+          <MenuItem value="HealthCheck">HealthCheck</MenuItem>
+          <MenuItem value="Hospital">Hospital</MenuItem>
+          <MenuItem value="OccupationalHealthcare">
+            Occupational Healthcare
+          </MenuItem>
+        </Select>
+
+        <TextField
+          label="Date"
+          type="date"
+          fullWidth
+          margin="normal"
           InputLabelProps={{ shrink: true }}
           value={date}
           onChange={({ target }) => setDate(target.value)}
-          sx={{ mb: 2 }}
-          required
         />
-
-        {/* Description Field is SECOND */}
         <TextField
           label="Description"
           fullWidth
+          margin="normal"
           value={description}
           onChange={({ target }) => setDescription(target.value)}
-          sx={{ mb: 2 }}
-          required
         />
-
         <TextField
           label="Specialist"
           fullWidth
+          margin="normal"
           value={specialist}
           onChange={({ target }) => setSpecialist(target.value)}
-          sx={{ mb: 2 }}
-          required
         />
 
-        <TextField
-          label="Diagnosis Codes (comma-separated)"
-          placeholder="e.g. L20, Z74.3"
+        <InputLabel style={{ marginTop: 10 }}>Diagnosis codes</InputLabel>
+        <Select
+          multiple
           fullWidth
-          value={diagnosisCodesInput}
-          onChange={({ target }) => setDiagnosisCodesInput(target.value)}
-          sx={{ mb: 2 }}
-        />
+          value={diagnosisCodes}
+          onChange={handleDiagnosisChange}
+          input={<OutlinedInput label="Diagnosis codes" />}
+          style={{ marginBottom: 10 }}
+        >
+          {diagnoses.map((d) => (
+            <MenuItem key={d.code} value={d.code}>
+              {d.code} — {d.name}
+            </MenuItem>
+          ))}
+        </Select>
 
-        {type === "HealthCheck" ? (
-          <FormControl fullWidth sx={{ mb: 3 }}>
-            <InputLabel id="health-check-rating-label">
-              Health Check Rating (0-3)
+        {/* Dynamic Extra Fields conditional blocks */}
+        {entryType === "HealthCheck" && (
+          <>
+            <InputLabel style={{ marginTop: 15 }}>
+              Health Check Rating
             </InputLabel>
             <Select
-              labelId="health-check-rating-label"
+              fullWidth
               value={healthCheckRating}
-              label="Health Check Rating (0-3)"
               onChange={({ target }) =>
                 setHealthCheckRating(Number(target.value))
               }
             >
-              <MenuItem value={0}>0 (Healthy)</MenuItem>
-              <MenuItem value={1}>1 (Low Risk)</MenuItem>
-              <MenuItem value={2}>2 (High Risk)</MenuItem>
-              <MenuItem value={3}>3 (Critical Risk)</MenuItem>
+              <MenuItem value={0}>0 — Healthy</MenuItem>
+              <MenuItem value={1}>1 — Low Risk</MenuItem>
+              <MenuItem value={2}>2 — High Risk</MenuItem>
+              <MenuItem value={3}>3 — Critical Risk</MenuItem>
               <MenuItem value={5}>5 (Invalid Value Test)</MenuItem>
             </Select>
-          </FormControl>
-        ) : (
+          </>
+        )}
+
+        {entryType === "Hospital" && (
           <Box
             sx={{
               border: "1px solid #ddd",
-              p: 2,
+              padding: 2,
+              marginTop: 2,
               borderRadius: 1,
-              mb: 3,
-              bgcolor: "#fafafa",
             }}
           >
-            <Typography
-              variant="body2"
-              sx={{ mb: 1, fontWeight: "bold", color: "text.secondary" }}
-            >
-              Discharge Information
+            <Typography variant="subtitle2" color="textSecondary">
+              Discharge Details
             </Typography>
             <TextField
-              type="date"
               label="Discharge Date"
+              type="date"
               fullWidth
+              margin="dense"
               InputLabelProps={{ shrink: true }}
               value={dischargeDate}
               onChange={({ target }) => setDischargeDate(target.value)}
-              sx={{ mb: 2 }}
-              required
             />
             <TextField
               label="Discharge Criteria"
               fullWidth
+              margin="dense"
               value={dischargeCriteria}
               onChange={({ target }) => setDischargeCriteria(target.value)}
-              required
             />
           </Box>
         )}
 
-        {/* Action button layout positioned exactly like the screenshot */}
-        <Box sx={{ display: "flex", gap: 1 }}>
-          <Button type="submit" variant="contained" color="primary">
-            ADD
-          </Button>
+        {entryType === "OccupationalHealthcare" && (
+          <>
+            <TextField
+              label="Employer Name"
+              fullWidth
+              margin="normal"
+              value={employerName}
+              onChange={({ target }) => setEmployerName(target.value)}
+            />
+            <Box
+              sx={{
+                border: "1px solid #ddd",
+                padding: 2,
+                marginTop: 2,
+                borderRadius: 1,
+              }}
+            >
+              <Typography variant="subtitle2" color="textSecondary">
+                Sick Leave (Optional)
+              </Typography>
+              <TextField
+                label="Start Date"
+                type="date"
+                fullWidth
+                margin="dense"
+                InputLabelProps={{ shrink: true }}
+                value={sickLeaveStartDate}
+                onChange={({ target }) => setSickLeaveStartDate(target.value)}
+              />
+              <TextField
+                label="End Date"
+                type="date"
+                fullWidth
+                margin="dense"
+                InputLabelProps={{ shrink: true }}
+                value={sickLeaveEndDate}
+                onChange={({ target }) => setSickLeaveEndDate(target.value)}
+              />
+            </Box>
+          </>
+        )}
+
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          style={{ marginTop: 20 }}
+        >
           <Button
-            variant="outlined"
-            color="primary"
+            color="error"
+            variant="contained"
             type="button"
             onClick={onCancel}
-            sx={{ bgcolor: "#fff", color: "#1976d2", borderColor: "#ccc" }}
           >
-            CANCEL
+            Cancel
+          </Button>
+          <Button color="primary" variant="contained" type="submit">
+            Add
           </Button>
         </Box>
       </form>

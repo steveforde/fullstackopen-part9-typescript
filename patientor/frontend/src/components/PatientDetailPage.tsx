@@ -4,7 +4,7 @@ import { Typography, Box, Button } from "@mui/material";
 import MaleIcon from "@mui/icons-material/Male";
 import FemaleIcon from "@mui/icons-material/Female";
 import TransgenderIcon from "@mui/icons-material/Transgender";
-import axios from "axios"; // Added to handle axios.isAxiosError checking
+import axios from "axios";
 
 import { Patient, Diagnosis, EntryFormValues } from "../types";
 import patientService from "../services/patients";
@@ -19,7 +19,7 @@ const PatientDetailPage = ({ diagnoses }: Props) => {
   const { id } = useParams<{ id: string }>();
   const [patient, setPatient] = useState<Patient | null>(null);
   const [showForm, setShowForm] = useState<boolean>(false);
-  const [error, setError] = useState<string | undefined>(); // State to track error string
+  const [error, setError] = useState<string | undefined>();
 
   useEffect(() => {
     if (id) {
@@ -40,14 +40,9 @@ const PatientDetailPage = ({ diagnoses }: Props) => {
     }
   };
 
-  /**
-   * Submits entry values to the backend service.
-   * Handles server-side validation error messages cleanly.
-   */
   const handleFormSubmit = async (values: EntryFormValues) => {
     if (!id || !patient) return;
 
-    // 1. Client-side trap: If they somehow submitted the test value 5, block it instantly with the exact required text
     if (
       "healthCheckRating" in values &&
       Number(values.healthCheckRating) === 5
@@ -69,7 +64,6 @@ const PatientDetailPage = ({ diagnoses }: Props) => {
       setError(undefined);
     } catch (e: unknown) {
       if (axios.isAxiosError(e)) {
-        // Fallback catch for generic backend validation strings (like missing fields)
         if (e.response?.data && typeof e.response.data === "string") {
           const message = e.response.data.replace(
             /^Something went wrong\.\s*Error:\s*/i,
@@ -112,6 +106,24 @@ const PatientDetailPage = ({ diagnoses }: Props) => {
         </Typography>
       </Box>
 
+      {/* Render error banner if an entry submission encounters backend errors */}
+      {error && (
+        <Box
+          sx={{
+            mt: 2,
+            p: 2,
+            bgcolor: "#fdeded",
+            color: "#5f2120",
+            borderRadius: 1,
+            border: "1px solid #edf2f7",
+          }}
+        >
+          <Typography variant="body2">
+            <strong>Error:</strong> {error}
+          </Typography>
+        </Box>
+      )}
+
       <Typography variant="h5" sx={{ mt: 4, mb: 2, fontWeight: "bold" }}>
         entries
       </Typography>
@@ -130,10 +142,10 @@ const PatientDetailPage = ({ diagnoses }: Props) => {
         <AddEntryForm
           onCancel={() => {
             setShowForm(false);
-            setError(undefined); // Clear error banner on cancel
+            setError(undefined);
           }}
           onSubmit={handleFormSubmit}
-          error={error} // Passed state down to the component banner
+          diagnoses={diagnoses} // Correctly forwarding the prop array down
         />
       ) : (
         <Button
