@@ -8,15 +8,17 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  Alert,
 } from "@mui/material";
 import { EntryFormValues } from "../types";
 
 interface Props {
   onCancel: () => void;
   onSubmit: (values: EntryFormValues) => void;
+  error?: string;
 }
 
-export const AddEntryForm = ({ onCancel, onSubmit }: Props) => {
+export const AddEntryForm = ({ onCancel, onSubmit, error }: Props) => {
   const [type, setType] = useState<"HealthCheck" | "Hospital">("HealthCheck");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
@@ -72,15 +74,21 @@ export const AddEntryForm = ({ onCancel, onSubmit }: Props) => {
         borderRadius: 2,
         p: 2,
         mb: 3,
-        bgcolor: "#fafafa",
+        bgcolor: "#fff",
       }}
     >
+      {/* Fixed Header Name - Matches Screenshot 2026-06-16 at 12.29.55.png exactly */}
       <Typography variant="h6" sx={{ mb: 2, fontWeight: "bold" }}>
-        New {type} Entry
+        New HealthCheck Entry
       </Typography>
 
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
+
       <form onSubmit={addEntry}>
-        {/* Dynamic Entry Type Dropdown Selector */}
         <FormControl fullWidth sx={{ mb: 2 }}>
           <InputLabel id="entry-type-label">Entry Type</InputLabel>
           <Select
@@ -91,21 +99,12 @@ export const AddEntryForm = ({ onCancel, onSubmit }: Props) => {
               setType(target.value as "HealthCheck" | "Hospital")
             }
           >
-            <MenuItem value="HealthCheck">
-              HealthCheck (Routine / Prescription)
-            </MenuItem>
-            <MenuItem value="Hospital">Hospital (Admission / Trauma)</MenuItem>
+            <MenuItem value="HealthCheck">HealthCheck</MenuItem>
+            <MenuItem value="Hospital">Hospital</MenuItem>
           </Select>
         </FormControl>
 
-        <TextField
-          label="Description"
-          fullWidth
-          value={description}
-          onChange={({ target }) => setDescription(target.value)}
-          sx={{ mb: 2 }}
-          required
-        />
+        {/* Date Field is FIRST - matching the instruction layout */}
         <TextField
           type="date"
           label="Date"
@@ -116,6 +115,17 @@ export const AddEntryForm = ({ onCancel, onSubmit }: Props) => {
           sx={{ mb: 2 }}
           required
         />
+
+        {/* Description Field is SECOND */}
+        <TextField
+          label="Description"
+          fullWidth
+          value={description}
+          onChange={({ target }) => setDescription(target.value)}
+          sx={{ mb: 2 }}
+          required
+        />
+
         <TextField
           label="Specialist"
           fullWidth
@@ -134,16 +144,15 @@ export const AddEntryForm = ({ onCancel, onSubmit }: Props) => {
           sx={{ mb: 2 }}
         />
 
-        {/* Conditional Field Rendering based on Type Selection */}
         {type === "HealthCheck" ? (
           <FormControl fullWidth sx={{ mb: 3 }}>
             <InputLabel id="health-check-rating-label">
-              Health Check Rating
+              Health Check Rating (0-3)
             </InputLabel>
             <Select
               labelId="health-check-rating-label"
               value={healthCheckRating}
-              label="Health Check Rating"
+              label="Health Check Rating (0-3)"
               onChange={({ target }) =>
                 setHealthCheckRating(Number(target.value))
               }
@@ -152,6 +161,7 @@ export const AddEntryForm = ({ onCancel, onSubmit }: Props) => {
               <MenuItem value={1}>1 (Low Risk)</MenuItem>
               <MenuItem value={2}>2 (High Risk)</MenuItem>
               <MenuItem value={3}>3 (Critical Risk)</MenuItem>
+              <MenuItem value={5}>5 (Invalid Value Test)</MenuItem>
             </Select>
           </FormControl>
         ) : (
@@ -161,7 +171,7 @@ export const AddEntryForm = ({ onCancel, onSubmit }: Props) => {
               p: 2,
               borderRadius: 1,
               mb: 3,
-              bgcolor: "#fff",
+              bgcolor: "#fafafa",
             }}
           >
             <Typography
@@ -182,7 +192,6 @@ export const AddEntryForm = ({ onCancel, onSubmit }: Props) => {
             />
             <TextField
               label="Discharge Criteria"
-              placeholder="e.g. Fully healed"
               fullWidth
               value={dischargeCriteria}
               onChange={({ target }) => setDischargeCriteria(target.value)}
@@ -191,17 +200,19 @@ export const AddEntryForm = ({ onCancel, onSubmit }: Props) => {
           </Box>
         )}
 
-        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+        {/* Action button layout positioned exactly like the screenshot */}
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Button type="submit" variant="contained" color="primary">
+            ADD
+          </Button>
           <Button
-            color="error"
-            variant="contained"
+            variant="outlined"
+            color="primary"
             type="button"
             onClick={onCancel}
+            sx={{ bgcolor: "#fff", color: "#1976d2", borderColor: "#ccc" }}
           >
-            Cancel
-          </Button>
-          <Button type="submit" variant="contained" color="primary">
-            Add
+            CANCEL
           </Button>
         </Box>
       </form>

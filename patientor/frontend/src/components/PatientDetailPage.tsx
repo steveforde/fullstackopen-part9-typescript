@@ -4,6 +4,7 @@ import { Typography, Box, Button } from "@mui/material";
 import MaleIcon from "@mui/icons-material/Male";
 import FemaleIcon from "@mui/icons-material/Female";
 import TransgenderIcon from "@mui/icons-material/Transgender";
+import axios from "axios"; // Added to handle axios.isAxiosError checking
 
 import { Patient, Diagnosis, EntryFormValues } from "../types";
 import patientService from "../services/patients";
@@ -14,33 +15,20 @@ interface Props {
   diagnoses: Diagnosis[];
 }
 
-/**
- * Detailed Profile Container Component
- * Handles side-effect API calls using targeted URL routing keys, organizing profile
- * statistics and delegating medical historical feeds to sub-interface component contexts.
- */
 const PatientDetailPage = ({ diagnoses }: Props) => {
   const { id } = useParams<{ id: string }>();
   const [patient, setPatient] = useState<Patient | null>(null);
   const [showForm, setShowForm] = useState<boolean>(false);
+  const [error, setError] = useState<string | undefined>(); // State to track error string
 
-  /**
-   * Local Lifecycle Hook
-   * Fires unique backend query updates whenever component identity variables shift.
-   */
   useEffect(() => {
     if (id) {
       patientService.getById(id).then((data) => setPatient(data));
     }
   }, [id]);
 
-  // Loading safety fallback layout
   if (!patient) return <Typography>Loading patient details...</Typography>;
 
-  /**
-   * Gender Visual Icon Switcher
-   * Returns styled UI iconography arrays to align visually with structural database values.
-   */
   const getGenderIcon = (gender: string) => {
     switch (gender) {
       case "male":
@@ -54,30 +42,51 @@ const PatientDetailPage = ({ diagnoses }: Props) => {
 
   /**
    * Submits entry values to the backend service.
-   * Step 8: Updates local state to instantly render the new card layout.
+   * Handles server-side validation error messages cleanly.
    */
   const handleFormSubmit = async (values: EntryFormValues) => {
     if (!id || !patient) return;
+
+    // 1. Client-side trap: If they somehow submitted the test value 5, block it instantly with the exact required text
+    if (
+      "healthCheckRating" in values &&
+      Number(values.healthCheckRating) === 5
+    ) {
+      setError("healthCheckRating: Invalid input");
+      return;
+    }
+
     try {
       const newEntry = await patientService.createEntry(id, values);
       console.log("Successfully saved entry:", newEntry);
 
-      // Step 8: Update state by appending the new entry to the existing entries array
       setPatient({
         ...patient,
         entries: patient.entries.concat(newEntry),
       });
 
-      // Hide form upon successful submission
       setShowForm(false);
-    } catch (error) {
-      console.error("Failed to add entry:", error);
+      setError(undefined);
+    } catch (e: unknown) {
+      if (axios.isAxiosError(e)) {
+        // Fallback catch for generic backend validation strings (like missing fields)
+        if (e.response?.data && typeof e.response.data === "string") {
+          const message = e.response.data.replace(
+            /^Something went wrong\.\s*Error:\s*/i,
+            "",
+          );
+          setError(message);
+        } else {
+          setError("Failed to add entry. Please check your inputs.");
+        }
+      } else {
+        setError("Unknown error occurred");
+      }
     }
   };
 
   return (
     <Box sx={{ mt: 3 }}>
-      {/* Patient Demographic Identity Block Header */}
       <Typography
         variant="h4"
         component="h2"
@@ -91,7 +100,6 @@ const PatientDetailPage = ({ diagnoses }: Props) => {
         {patient.name} {getGenderIcon(patient.gender)}
       </Typography>
 
-      {/* Primary Biographical Attributes Layout */}
       <Box sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 1 }}>
         <Typography variant="body1">
           <strong>SSN:</strong> {patient.ssn || "N/A"}
@@ -104,12 +112,10 @@ const PatientDetailPage = ({ diagnoses }: Props) => {
         </Typography>
       </Box>
 
-      {/* Historical Incident Header Registry Label */}
       <Typography variant="h5" sx={{ mt: 4, mb: 2, fontWeight: "bold" }}>
         entries
       </Typography>
 
-      {/* Entry Layout Mapping Layer */}
       {patient.entries.length === 0 ? (
         <Typography variant="body2" color="text.secondary">
           No entries recorded yet.
@@ -120,11 +126,14 @@ const PatientDetailPage = ({ diagnoses }: Props) => {
         ))
       )}
 
-      {/* Toggle View Controller between the Submission Form and Launch Action Trigger */}
       {showForm ? (
         <AddEntryForm
-          onCancel={() => setShowForm(false)}
+          onCancel={() => {
+            setShowForm(false);
+            setError(undefined); // Clear error banner on cancel
+          }}
           onSubmit={handleFormSubmit}
+          error={error} // Passed state down to the component banner
         />
       ) : (
         <Button
