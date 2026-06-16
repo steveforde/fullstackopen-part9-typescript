@@ -1,5 +1,6 @@
 import { Box, Card, CardContent, Typography } from "@mui/material";
 import MedicalServicesIcon from "@mui/icons-material/MedicalServices";
+import LocalHospitalIcon from "@mui/icons-material/LocalHospital"; // Added for Hospital entries
 import WorkIcon from "@mui/icons-material/Work";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 
@@ -53,7 +54,8 @@ export const EntryDetails = ({ entry, diagnoses }: EntryDetailsProps) => {
               <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                 {entry.date}
               </Typography>
-              <MedicalServicesIcon />
+              <LocalHospitalIcon color="error" />{" "}
+              {/* Fixed: Shows a clean hospital icon */}
             </Box>
             <Typography variant="body2" sx={{ fontStyle: "italic" }}>
               {entry.description}
@@ -111,7 +113,8 @@ export const EntryDetails = ({ entry, diagnoses }: EntryDetailsProps) => {
               <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                 {entry.date}
               </Typography>
-              <MedicalServicesIcon />
+              <MedicalServicesIcon color="primary" />{" "}
+              {/* Keeps the clean medical bag icon */}
             </Box>
             <Typography variant="body2" sx={{ fontStyle: "italic" }}>
               {entry.description}
